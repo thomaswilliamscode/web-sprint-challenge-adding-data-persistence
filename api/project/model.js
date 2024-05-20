@@ -42,10 +42,29 @@ const newProject = await db('projects')
 return getById(newProject[0])
 }
 
+const edit = (info) => {
+	const {project_completed} =
+		info;
+
+
+	if (project_completed) {
+		return {
+			...info,
+			project_completed: true
+		}
+	} else {
+		return {
+			...info,
+			project_completed: false,
+		};
+	}
+};
+
 
 
 module.exports = {
 	get,
 	post,
-	getById
+	getById,
+	edit
 }

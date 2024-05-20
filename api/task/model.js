@@ -2,42 +2,39 @@
 const db = require('../../data/dbConfig')
 
 const getAll = async () => {
-	let newArray = []
-	const array = await db('tasks')
+// 	select
+//     p.project_name,
+//     p.project_description
+// from projects as p
+// left join tasks as t
+//     on p.project_id = t.project_id;
+		const query = await db('tasks as t')
+			.leftJoin('projects as p', 't.project_id', 'p.project_id')
+			.select(
+				't.task_id',
+				't.task_description',
+				't.task_notes',
+				't.task_completed',
+				't.project_id',
+				'p.project_name',
+				'p.project_description'
+			);
 
-	for (let i = 0; i < array.length; i++) {
-		let completed = false;
-		const {
-			task_id,
-			task_description,
-			task_notes,
-			task_completed,
-			project_id,
-		} = array[i]
-
-		const project = await db('projects').where('project_id', project_id);
-
-		const { project_name, project_description } = project;
-
-		if (task_completed) {
-			completed = true;
-		}
-
-		let newObj = {
-			task_id: task_id,
-			task_description: task_description,
-			task_notes: task_notes,
-			task_completed: completed,
-			project_name: project_name,
-			project_description: project_description,
-		};
-
-		newArray.push(newObj);
-	}
-
-
-	return newArray
-}
+		const taskMap = query.map((task) => {
+			if (task.task_completed === 0) {
+				return {
+					...task,
+					task_completed: false,
+				};
+			} else if (task.task_completed === 1) {
+				return {
+					...task,
+					task_completed: true,
+				};
+			}
+		});
+		return taskMap;
+	};
 
 const getById = async (id) => {
 	const array = await db('tasks')

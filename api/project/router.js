@@ -16,7 +16,8 @@ router.get('/:id', Middle.idCheck, async (req, res) => {
 router.post('/', Middle.bodyCheck, async (req,res) => {
 	const { info } = req
 	const newProject = await Projects.post(info)
-	res.status(200).json(newProject)
+	const update = Projects.edit(newProject)
+	res.status(200).json(update)
 })
 
 router.use( (err, req, res, next) => {
